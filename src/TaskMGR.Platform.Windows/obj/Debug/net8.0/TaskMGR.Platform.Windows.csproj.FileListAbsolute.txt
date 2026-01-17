@@ -1,0 +1,15 @@
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.csproj.AssemblyReference.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.AssemblyInfoInputs.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.AssemblyInfo.cs
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.csproj.CoreCompileInputs.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/bin/Debug/net8.0/TaskMGR.Platform.Windows.deps.json
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/bin/Debug/net8.0/TaskMGR.Platform.Windows.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/bin/Debug/net8.0/TaskMGR.Platform.Windows.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/bin/Debug/net8.0/TaskMGR.Core.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/bin/Debug/net8.0/TaskMGR.Core.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.csproj.CopyComplete
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/refint/TaskMGR.Platform.Windows.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/TaskMGR.Platform.Windows.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/Debug/net8.0/ref/TaskMGR.Platform.Windows.dll

@@ -1,0 +1,118 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/TaskMGR.Platform.Windows.csproj": {}
+  },
+  "projects": {
+    "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/TaskMGR.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/TaskMGR.Core.csproj",
+        "projectName": "TaskMGR.Core",
+        "projectPath": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/TaskMGR.Core.csproj",
+        "packagesPath": "/Users/macuser/.nuget/packages/",
+        "outputPath": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/macuser/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.123/libexec/sdk/8.0.123/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/TaskMGR.Platform.Windows.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/TaskMGR.Platform.Windows.csproj",
+        "projectName": "TaskMGR.Platform.Windows",
+        "projectPath": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/TaskMGR.Platform.Windows.csproj",
+        "packagesPath": "/Users/macuser/.nuget/packages/",
+        "outputPath": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.Windows/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/macuser/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/TaskMGR.Core.csproj": {
+                "projectPath": "/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Core/TaskMGR.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.123/libexec/sdk/8.0.123/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

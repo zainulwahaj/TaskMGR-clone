@@ -1,0 +1,15 @@
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/bin/Debug/net8.0/TaskMGR.Platform.MacOS.deps.json
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/bin/Debug/net8.0/TaskMGR.Platform.MacOS.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/bin/Debug/net8.0/TaskMGR.Platform.MacOS.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/bin/Debug/net8.0/TaskMGR.Core.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/bin/Debug/net8.0/TaskMGR.Core.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.csproj.AssemblyReference.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.AssemblyInfoInputs.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.AssemblyInfo.cs
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.csproj.CoreCompileInputs.cache
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.csproj.CopyComplete
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/refint/TaskMGR.Platform.MacOS.dll
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/TaskMGR.Platform.MacOS.pdb
+/Users/macuser/Desktop/code/taskMGR-clone/src/TaskMGR.Platform.MacOS/obj/Debug/net8.0/ref/TaskMGR.Platform.MacOS.dll
