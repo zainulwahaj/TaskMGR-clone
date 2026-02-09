@@ -1,544 +1,278 @@
-# TaskMGR - Cross-Platform Task Manager
+# TaskMGR
 
-> A native, high-performance system monitor and process manager for Windows and macOS
+<div align="center">
 
-**Version:** 1.0.0  
-**Date:** January 2026  
-**Platform:** Windows 10+, macOS 11+  
-**Runtime:** .NET 8.0  
+![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)
+![Avalonia UI](https://img.shields.io/badge/Avalonia-11.3-8B44AC?style=flat-square)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
----
+**A modern, cross-platform task manager built with .NET 8 and Avalonia UI**
 
-## Table of Contents
+[Features](#features) • [Installation](#installation) • [Building](#building-from-source) • [Architecture](#architecture) • [Contributing](#contributing)
 
-1. [Executive Summary](#1-executive-summary)
-2. [System Requirements](#2-system-requirements)
-3. [Architecture Overview](#3-architecture-overview)
-4. [Project Structure](#4-project-structure)
-5. [Technical Specifications](#5-technical-specifications)
-6. [Core Components](#6-core-components)
-7. [Platform Implementations](#7-platform-implementations)
-8. [User Interface](#8-user-interface)
-9. [Data Flow](#9-data-flow)
-10. [Build & Deployment](#10-build--deployment)
-11. [API Reference](#11-api-reference)
-12. [Future Enhancements](#12-future-enhancements)
+</div>
 
 ---
 
-## 1. Executive Summary
+## Overview
 
-TaskMGR is a cross-platform task manager application that provides real-time process monitoring and system resource visualization. Built with .NET 8 and Avalonia UI, it delivers native performance while maintaining a single codebase for both Windows and macOS platforms.
+TaskMGR is a native, high-performance system monitor and process manager that runs on both Windows and macOS from a single codebase. It provides real-time process monitoring, system resource visualization, and process management capabilities with a modern dark-themed interface.
 
-### Key Features
+<div align="center">
 
-| Feature | Description |
-|---------|-------------|
-| Process Listing | View all running processes with PID, name, CPU%, memory, status, user |
-| System Metrics | Real-time CPU usage, memory consumption, process count, uptime |
-| Process Control | Terminate selected processes |
-| Search & Filter | Instant process filtering by name |
-| Auto-Refresh | Configurable refresh interval (default: 2 seconds) |
-| Dark Theme | Modern dark UI optimized for extended use |
+<!-- Add screenshot here -->
+<!-- ![TaskMGR Screenshot](docs/screenshot.png) -->
 
----
+</div>
 
-## 2. System Requirements
+## Features
 
-### Runtime Requirements
+- **📊 Real-Time Process Monitoring** — View all running processes with PID, name, CPU%, memory usage, status, and user
+- **💻 System Metrics Dashboard** — Live CPU usage, memory consumption, process count, and system uptime
+- **⚡ Process Control** — Terminate selected processes with a single click
+- **🔍 Instant Search** — Filter processes by name in real-time
+- **🔄 Auto-Refresh** — Automatic updates every 2 seconds (configurable)
+- **🌙 Dark Theme** — Modern dark UI optimized for extended use
+- **🖥️ Cross-Platform** — Native performance on Windows 10+ and macOS 11+
 
-| Platform | Minimum Version | Architecture |
-|----------|-----------------|--------------|
-| Windows | Windows 10 (1809+) | x64, ARM64 |
-| macOS | macOS 11 Big Sur | x64, ARM64 (Apple Silicon) |
+## Installation
 
-### Development Requirements
+### Pre-built Binaries
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| .NET SDK | 8.0+ | Build and runtime |
-| IDE | VS Code / Visual Studio / Rider | Development |
-| Git | 2.0+ | Version control |
+Download the latest release for your platform from the [Releases](https://github.com/yourusername/TaskMGR/releases) page.
 
----
+| Platform | Architecture | Download |
+|----------|--------------|----------|
+| Windows | x64 | `TaskMGR-win-x64.zip` |
+| Windows | ARM64 | `TaskMGR-win-arm64.zip` |
+| macOS | Intel | `TaskMGR-osx-x64.dmg` |
+| macOS | Apple Silicon | `TaskMGR-osx-arm64.dmg` |
 
-## 3. Architecture Overview
+### System Requirements
 
-### 3.1 High-Level Architecture
+| Platform | Minimum Version |
+|----------|-----------------|
+| Windows | Windows 10 (1809+) |
+| macOS | macOS 11 Big Sur |
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      PRESENTATION LAYER                      │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                    TaskMGR.UI                           ││
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ││
-│  │  │    Views     │  │  ViewModels  │  │  Converters  │  ││
-│  │  │  (XAML/AXAML)│  │   (MVVM)     │  │              │  ││
-│  │  └──────────────┘  └──────────────┘  └──────────────┘  ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      ABSTRACTION LAYER                       │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                    TaskMGR.Core                         ││
-│  │  ┌──────────────────────┐  ┌──────────────────────┐    ││
-│  │  │      Interfaces      │  │       Models         │    ││
-│  │  │  • IPlatformService  │  │  • ProcessInfo       │    ││
-│  │  │  • IProcessProvider  │  │  • SystemMetrics     │    ││
-│  │  │  • ISystemMetrics    │  │                      │    ││
-│  │  └──────────────────────┘  └──────────────────────┘    ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      PLATFORM LAYER                          │
-│  ┌──────────────────────┐    ┌──────────────────────┐      │
-│  │ TaskMGR.Platform     │    │ TaskMGR.Platform     │      │
-│  │      .Windows        │    │      .MacOS          │      │
-│  │  ┌────────────────┐  │    │  ┌────────────────┐  │      │
-│  │  │ Windows        │  │    │  │ MacOS          │  │      │
-│  │  │ PlatformService│  │    │  │ PlatformService│  │      │
-│  │  └────────────────┘  │    │  └────────────────┘  │      │
-│  │         │            │    │         │            │      │
-│  │         ▼            │    │         ▼            │      │
-│  │  ┌────────────────┐  │    │  ┌────────────────┐  │      │
-│  │  │   P/Invoke     │  │    │  │ Shell Commands │  │      │
-│  │  │  kernel32.dll  │  │    │  │ ps/top/vm_stat │  │      │
-│  │  └────────────────┘  │    │  └────────────────┘  │      │
-│  └──────────────────────┘    └──────────────────────┘      │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    OPERATING SYSTEM                          │
-│            Windows NT Kernel  /  Darwin (XNU)                │
-└─────────────────────────────────────────────────────────────┘
+> **Note:** Pre-built releases are self-contained — no .NET runtime installation required.
+
+## Building from Source
+
+### Prerequisites
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later
+- Git
+
+### Clone and Build
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/TaskMGR.git
+cd TaskMGR
+
+# Restore dependencies
+dotnet restore
+
+# Build in Debug mode
+dotnet build
+
+# Run the application
+dotnet run --project src/TaskMGR.UI
 ```
 
-### 3.2 Design Patterns
+### Publishing for Distribution
 
-| Pattern | Implementation | Purpose |
-|---------|---------------|---------|
-| **MVVM** | ViewModels + Data Binding | Separation of UI and business logic |
-| **Strategy** | `IPlatformService` implementations | Platform-specific behavior abstraction |
-| **Factory** | `PlatformServiceFactory` | Runtime platform detection and instantiation |
-| **Observer** | `INotifyPropertyChanged` | Reactive UI updates |
-
-### 3.3 Dependency Graph
-
-```
-TaskMGR.UI
-    ├── TaskMGR.Core
-    ├── TaskMGR.Platform.Windows
-    │       └── TaskMGR.Core
-    └── TaskMGR.Platform.MacOS
-            └── TaskMGR.Core
+#### macOS (Apple Silicon)
+```bash
+dotnet publish src/TaskMGR.UI -c Release -r osx-arm64 --self-contained -p:PublishSingleFile=true
 ```
 
----
+#### macOS (Intel)
+```bash
+dotnet publish src/TaskMGR.UI -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+```
 
-## 4. Project Structure
+#### Windows (x64)
+```bash
+dotnet publish src/TaskMGR.UI -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+```
+
+#### Windows (ARM64)
+```bash
+dotnet publish src/TaskMGR.UI -c Release -r win-arm64 --self-contained -p:PublishSingleFile=true
+```
+
+Output will be in `src/TaskMGR.UI/bin/Release/net8.0/{runtime}/publish/`
+
+> 📦 See [PACKAGING.md](PACKAGING.md) for detailed instructions on creating `.app` bundles and `.dmg` installers for macOS.
+
+## Project Structure
 
 ```
 TaskMGR/
-├── TaskMGR.sln                          # Solution file
-├── README.md                            # This document
-├── PACKAGING.md                         # Distribution guide
+├── src/
+│   ├── TaskMGR.Core/                 # Shared abstractions and models
+│   │   ├── Interfaces/
+│   │   │   ├── IPlatformService.cs   # Platform abstraction interface
+│   │   │   ├── IProcessProvider.cs   # Process operations contract
+│   │   │   └── ISystemMetricsProvider.cs
+│   │   └── Models/
+│   │       ├── ProcessInfo.cs        # Process data model
+│   │       └── SystemMetrics.cs      # System metrics model
+│   │
+│   ├── TaskMGR.Platform.Windows/     # Windows-specific implementation
+│   │   └── WindowsPlatformService.cs # P/Invoke with kernel32.dll
+│   │
+│   ├── TaskMGR.Platform.MacOS/       # macOS-specific implementation
+│   │   └── MacOSPlatformService.cs   # Shell commands (ps, vm_stat)
+│   │
+│   └── TaskMGR.UI/                   # Avalonia UI application
+│       ├── ViewModels/
+│       │   └── MainWindowViewModel.cs
+│       ├── Views/
+│       ├── Converters/
+│       ├── Services/
+│       │   └── PlatformServiceFactory.cs
+│       ├── MainWindow.axaml          # Main UI layout
+│       └── Program.cs                # Entry point
 │
-└── src/
-    ├── TaskMGR.Core/                    # Shared library
-    │   ├── TaskMGR.Core.csproj
-    │   ├── Interfaces/
-    │   │   ├── IPlatformService.cs      # Combined interface
-    │   │   ├── IProcessProvider.cs      # Process operations
-    │   │   └── ISystemMetricsProvider.cs# System metrics
-    │   └── Models/
-    │       ├── ProcessInfo.cs           # Process data record
-    │       └── SystemMetrics.cs         # System metrics record
-    │
-    ├── TaskMGR.Platform.Windows/        # Windows implementation
-    │   ├── TaskMGR.Platform.Windows.csproj
-    │   └── WindowsPlatformService.cs    # Windows-specific logic
-    │
-    ├── TaskMGR.Platform.MacOS/          # macOS implementation
-    │   ├── TaskMGR.Platform.MacOS.csproj
-    │   └── MacOSPlatformService.cs      # macOS-specific logic
-    │
-    └── TaskMGR.UI/                      # Avalonia application
-        ├── TaskMGR.UI.csproj
-        ├── Program.cs                   # Entry point
-        ├── App.axaml                    # Application resources
-        ├── App.axaml.cs
-        ├── MainWindow.axaml             # Main UI layout
-        ├── MainWindow.axaml.cs
-        ├── app.manifest                 # Windows manifest
-        ├── Converters/
-        │   └── BytesToStringConverter.cs# Memory formatting
-        ├── Services/
-        │   └── PlatformServiceFactory.cs# Platform detection
-        └── ViewModels/
-            └── MainWindowViewModel.cs   # Main view logic
+├── TaskMGR.sln                       # Solution file
+├── README.md
+└── PACKAGING.md                      # Distribution guide
 ```
 
----
+## Architecture
 
-## 5. Technical Specifications
+TaskMGR follows a clean, layered architecture with platform-specific implementations abstracted behind shared interfaces.
 
-### 5.1 Technology Stack
-
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Runtime | .NET | 8.0 LTS |
-| UI Framework | Avalonia UI | 11.3.11 |
-| UI Theme | Fluent Design | Built-in |
-| MVVM Toolkit | CommunityToolkit.Mvvm | 8.2.2 |
-| Data Grid | Avalonia.Controls.DataGrid | 11.3.11 |
-
-### 5.2 NuGet Dependencies
-
-```xml
-<!-- TaskMGR.UI Dependencies -->
-<PackageReference Include="Avalonia" Version="11.3.11" />
-<PackageReference Include="Avalonia.Desktop" Version="11.3.11" />
-<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.11" />
-<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.11" />
-<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.11" />
-<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-<PackageReference Include="Avalonia.Diagnostics" Version="11.3.11" />
+```
+┌───────────────────────────────────────────────────────┐
+│                   Presentation Layer                   │
+│              TaskMGR.UI (Avalonia + MVVM)             │
+└───────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌───────────────────────────────────────────────────────┐
+│                   Abstraction Layer                    │
+│         TaskMGR.Core (Interfaces + Models)            │
+└───────────────────────────────────────────────────────┘
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+┌─────────────────────────┐  ┌─────────────────────────┐
+│   TaskMGR.Platform      │  │   TaskMGR.Platform      │
+│        .Windows         │  │        .MacOS           │
+│    (P/Invoke APIs)      │  │   (Shell Commands)      │
+└─────────────────────────┘  └─────────────────────────┘
 ```
 
-### 5.3 Target Frameworks
+### Design Patterns
 
-| Project | Framework | Output |
-|---------|-----------|--------|
-| TaskMGR.Core | net8.0 | Class Library |
-| TaskMGR.Platform.Windows | net8.0 | Class Library |
-| TaskMGR.Platform.MacOS | net8.0 | Class Library |
-| TaskMGR.UI | net8.0 | WinExe |
+| Pattern | Usage |
+|---------|-------|
+| **MVVM** | Separation of UI and business logic via ViewModels and data binding |
+| **Strategy** | `IPlatformService` implementations for OS-specific behavior |
+| **Factory** | `PlatformServiceFactory` for runtime platform detection |
+| **Observer** | `INotifyPropertyChanged` for reactive UI updates |
 
----
+### Technology Stack
 
-## 6. Core Components
+| Component | Technology |
+|-----------|------------|
+| Runtime | .NET 8.0 LTS |
+| UI Framework | Avalonia UI 11.3 |
+| MVVM Toolkit | CommunityToolkit.Mvvm 8.2 |
+| Theme | Fluent Design (Dark) |
 
-### 6.1 Models
+## How It Works
 
-#### ProcessInfo
+### Platform Abstraction
+
+The core challenge of cross-platform development is handling OS-specific APIs. TaskMGR solves this with a Strategy pattern:
+
+**Windows:** Uses P/Invoke with `kernel32.dll` and the .NET `Process` class for accurate CPU percentage calculations with temporal caching.
+
+**macOS:** Parses native shell commands (`ps`, `top`, `vm_stat`) since Darwin doesn't expose the same APIs as Windows.
+
 ```csharp
-public record ProcessInfo
-{
-    public int Pid { get; init; }           // Process identifier
-    public string Name { get; init; }        // Process name
-    public double CpuPercent { get; init; }  // CPU usage percentage
-    public long MemoryBytes { get; init; }   // Working set memory
-    public string Status { get; init; }      // Running/Not Responding
-    public string User { get; init; }        // Owner username
-    public DateTime StartTime { get; init; } // Process start time
-}
-```
-
-#### SystemMetrics
-```csharp
-public record SystemMetrics
-{
-    public double CpuUsagePercent { get; init; }   // Total CPU usage
-    public long TotalMemoryBytes { get; init; }    // Total physical RAM
-    public long UsedMemoryBytes { get; init; }     // Used memory
-    public long AvailableMemoryBytes { get; init; }// Free memory
-    public int ProcessCount { get; init; }         // Running processes
-    public int ThreadCount { get; init; }          // Total threads
-    public TimeSpan Uptime { get; init; }          // System uptime
-}
-```
-
-### 6.2 Interfaces
-
-#### IProcessProvider
-```csharp
-public interface IProcessProvider
-{
-    Task<IReadOnlyList<ProcessInfo>> GetProcessesAsync(CancellationToken ct);
-    Task<ProcessInfo?> GetProcessByIdAsync(int pid, CancellationToken ct);
-    Task<bool> KillProcessAsync(int pid, CancellationToken ct);
-}
-```
-
-#### ISystemMetricsProvider
-```csharp
-public interface ISystemMetricsProvider
-{
-    Task<SystemMetrics> GetSystemMetricsAsync(CancellationToken ct);
-}
-```
-
-#### IPlatformService
-```csharp
+// The UI layer consumes IPlatformService without knowing the underlying OS
 public interface IPlatformService : IProcessProvider, ISystemMetricsProvider
 {
     string PlatformName { get; }
 }
 ```
 
----
+At runtime, `PlatformServiceFactory` detects the OS and instantiates the correct implementation:
 
-## 7. Platform Implementations
-
-### 7.1 macOS Implementation
-
-| Feature | Method | Command/API |
-|---------|--------|-------------|
-| Process List | `GetProcessesAsync` | `/bin/ps -eo pid,pcpu,rss,state,user,lstart,comm` |
-| CPU Usage | `GetSystemMetricsAsync` | `/usr/bin/top -l 1 -n 0 -stats cpu` |
-| Memory Info | `GetSystemMetricsAsync` | `/usr/bin/vm_stat` |
-| System Uptime | `GetSystemMetricsAsync` | `/usr/bin/uptime` |
-| Kill Process | `KillProcessAsync` | `Process.Kill()` |
-
-**Memory Calculation (vm_stat):**
-```
-Used Memory = (Active + Wired + Compressed) × Page Size
-Total Memory = (Free + Active + Inactive + Wired + Compressed) × Page Size
-```
-
-### 7.2 Windows Implementation
-
-| Feature | Method | API |
-|---------|--------|-----|
-| Process List | `GetProcessesAsync` | `System.Diagnostics.Process.GetProcesses()` |
-| CPU Usage | `GetProcessesAsync` | `Process.TotalProcessorTime` delta calculation |
-| Memory Info | `GetSystemMetricsAsync` | P/Invoke `GlobalMemoryStatusEx` |
-| System Uptime | `GetSystemMetricsAsync` | `Environment.TickCount64` |
-| Kill Process | `KillProcessAsync` | `Process.Kill()` |
-
-**P/Invoke Definition:**
 ```csharp
-[DllImport("kernel32.dll", SetLastError = true)]
-private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
-
-private struct MEMORYSTATUSEX
+public static IPlatformService Create()
 {
-    public int dwLength;
-    public int dwMemoryLoad;
-    public ulong ullTotalPhys;
-    public ulong ullAvailPhys;
-    // ... additional fields
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        return new WindowsPlatformService();
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        return new MacOSPlatformService();
+    throw new PlatformNotSupportedException();
 }
 ```
 
-**CPU Calculation:**
-```
-CPU% = (CurrentTotalTime - PreviousTotalTime) / (CurrentTime - PreviousTime) × 100 / ProcessorCount
-```
+## Usage
 
----
+1. **Launch the application** — The main window displays system metrics and a process list
+2. **Search processes** — Type in the search box to filter by process name
+3. **View details** — Click any process to select it
+4. **End a process** — Select a process and click "End Task" to terminate it
+5. **Refresh** — Data auto-refreshes every 2 seconds, or click "Refresh" manually
 
-## 8. User Interface
+## Contributing
 
-### 8.1 Layout Structure
+Contributions are welcome! Here's how to get started:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     HEADER (System Metrics)                  │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
-│  │   CPU    │ │  Memory  │ │ Processes│ │  Uptime  │       │
-│  │  12.5%   │ │ 8.2/16GB │ │   342    │ │ 5d 3h 2m │       │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
-├─────────────────────────────────────────────────────────────┤
-│                     TOOLBAR                                  │
-│  [Search...          ] Platform: macOS  [Refresh] [End Task]│
-├─────────────────────────────────────────────────────────────┤
-│                     PROCESS DATA GRID                        │
-│  ┌─────┬────────────┬───────┬────────┬────────┬──────────┐ │
-│  │ PID │ Name       │ CPU % │ Memory │ Status │ User     │ │
-│  ├─────┼────────────┼───────┼────────┼────────┼──────────┤ │
-│  │ 123 │ Safari     │  5.2  │ 1.2 GB │Running │ macuser  │ │
-│  │ 456 │ Terminal   │  0.1  │ 45 MB  │Running │ macuser  │ │
-│  │ ... │ ...        │  ...  │  ...   │  ...   │  ...     │ │
-│  └─────┴────────────┴───────┴────────┴────────┴──────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│                     STATUS BAR                               │
-│  342 processes | CPU: 12.5%                                  │
-└─────────────────────────────────────────────────────────────┘
-```
+1. **Fork** the repository
+2. **Create a branch** for your feature (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
 
-### 8.2 Color Scheme
-
-| Element | Color | Hex Code |
-|---------|-------|----------|
-| Background (Primary) | Dark Navy | `#0f0f23` |
-| Background (Secondary) | Navy | `#1a1a2e` |
-| Background (Tertiary) | Dark Blue | `#16213e` |
-| CPU Accent | Cyan | `#4cc9f0` |
-| Memory Accent | Pink | `#f72585` |
-| Process Count | Purple | `#7209b7` |
-| Uptime | Indigo | `#3a0ca3` |
-| Refresh Button | Blue | `#4361ee` |
-| End Task Button | Red | `#e63946` |
-| Text (Muted) | Gray | `#888888` |
-
-### 8.3 Data Binding
-
-| UI Element | Binding Path | Mode |
-|------------|--------------|------|
-| Process Grid | `Processes` | OneWay |
-| Selected Item | `SelectedProcess` | TwoWay |
-| Search Box | `SearchText` | TwoWay |
-| CPU Display | `SystemMetrics.CpuUsagePercent` | OneWay |
-| Memory Display | `MemoryUsageText` | OneWay |
-| Status Bar | `StatusMessage` | OneWay |
-
----
-
-## 9. Data Flow
-
-### 9.1 Refresh Cycle
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                      AUTO-REFRESH LOOP                        │
-│                                                               │
-│  ┌─────────┐    ┌─────────────┐    ┌──────────────────────┐  │
-│  │  Timer  │───▶│ RefreshAsync│───▶│ GetProcessesAsync    │  │
-│  │ (2 sec) │    │   Command   │    │ GetSystemMetricsAsync│  │
-│  └─────────┘    └─────────────┘    └──────────────────────┘  │
-│                        │                      │               │
-│                        │                      ▼               │
-│                        │           ┌──────────────────────┐  │
-│                        │           │  Platform Service    │  │
-│                        │           │  (Windows/macOS)     │  │
-│                        │           └──────────────────────┘  │
-│                        │                      │               │
-│                        │                      ▼               │
-│                        │           ┌──────────────────────┐  │
-│                        │           │     OS APIs          │  │
-│                        │           └──────────────────────┘  │
-│                        │                      │               │
-│                        ▼                      ▼               │
-│              ┌─────────────────────────────────────────────┐ │
-│              │            UPDATE UI                         │ │
-│              │  • Processes ObservableCollection            │ │
-│              │  • SystemMetrics property                    │ │
-│              │  • StatusMessage                             │ │
-│              └─────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### 9.2 Kill Process Flow
-
-```
-User Click ──▶ KillProcessCommand ──▶ KillProcessAsync(pid)
-                                              │
-                                              ▼
-                                    ┌──────────────────┐
-                                    │ Process.Kill()   │
-                                    └──────────────────┘
-                                              │
-                              ┌───────────────┴───────────────┐
-                              ▼                               ▼
-                        [Success]                        [Failure]
-                              │                               │
-                              ▼                               ▼
-                    RefreshAsync()              StatusMessage = "Failed..."
-```
-
----
-
-## 10. Build & Deployment
-
-### 10.1 Build Commands
+### Development Setup
 
 ```bash
-# Restore dependencies
+# Clone your fork
+git clone https://github.com/yourusername/TaskMGR.git
+
+# Install dependencies
 dotnet restore
 
-# Debug build
-dotnet build
-
-# Release build
-dotnet build -c Release
-
-# Run application
-dotnet run --project src/TaskMGR.UI
+# Run in development mode (with hot reload)
+dotnet watch --project src/TaskMGR.UI
 ```
 
-### 10.2 Publish Commands
+### Code Style
 
-| Platform | Command |
-|----------|---------|
-| macOS ARM64 | `dotnet publish src/TaskMGR.UI -c Release -r osx-arm64 --self-contained` |
-| macOS x64 | `dotnet publish src/TaskMGR.UI -c Release -r osx-x64 --self-contained` |
-| Windows x64 | `dotnet publish src/TaskMGR.UI -c Release -r win-x64 --self-contained` |
-| Windows ARM64 | `dotnet publish src/TaskMGR.UI -c Release -r win-arm64 --self-contained` |
+- Follow [C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Use meaningful commit messages
+- Add XML documentation for public APIs
 
-### 10.3 Output Locations
+## Roadmap
 
-```
-src/TaskMGR.UI/bin/
-├── Debug/net8.0/                    # Debug build
-└── Release/net8.0/
-    ├── osx-arm64/publish/           # macOS ARM64 publish
-    ├── osx-x64/publish/             # macOS Intel publish
-    ├── win-x64/publish/             # Windows x64 publish
-    └── win-arm64/publish/           # Windows ARM64 publish
-```
-
----
-
-## 11. API Reference
-
-### 11.1 MainWindowViewModel
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Processes` | `ObservableCollection<ProcessInfo>` | Displayed process list |
-| `SelectedProcess` | `ProcessInfo?` | Currently selected process |
-| `SystemMetrics` | `SystemMetrics` | Current system metrics |
-| `SearchText` | `string` | Filter text |
-| `IsLoading` | `bool` | Refresh in progress |
-| `StatusMessage` | `string` | Status bar text |
-| `PlatformName` | `string` | Current OS name |
-| `MemoryUsageText` | `string` | Formatted memory string |
-| `MemoryUsagePercent` | `double` | Memory usage 0-100 |
-| `UptimeText` | `string` | Formatted uptime |
-
-| Command | Description |
-|---------|-------------|
-| `RefreshCommand` | Manually refresh data |
-| `KillProcessCommand` | Terminate selected process |
-
-### 11.2 PlatformServiceFactory
-
-```csharp
-public static class PlatformServiceFactory
-{
-    // Returns WindowsPlatformService or MacOSPlatformService
-    // based on RuntimeInformation.IsOSPlatform()
-    public static IPlatformService Create();
-}
-```
-
----
-
-## 12. Future Enhancements
-
-| Priority | Feature | Description |
-|----------|---------|-------------|
-| High | Process Details | Detailed view with threads, handles, modules |
-| High | Performance Graphs | CPU/Memory history charts |
-| Medium | Process Tree | Hierarchical parent-child view |
-| Medium | Network Monitor | Per-process network usage |
-| Medium | Disk I/O | Read/write statistics |
-| Low | Linux Support | Add TaskMGR.Platform.Linux |
-| Low | Localization | Multi-language support |
-| Low | Themes | Light theme option |
-
----
+- [ ] Linux support (TaskMGR.Platform.Linux)
+- [ ] Process details panel (threads, handles, modules)
+- [ ] CPU/Memory usage graphs over time
+- [ ] Network activity monitoring
+- [ ] Disk I/O statistics
+- [ ] System tray integration
+- [ ] Configurable refresh intervals via UI
+- [ ] Export process list to CSV
 
 ## License
 
-MIT License - See LICENSE file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-*Generated: January 2026*
+<div align="center">
+
+**Built with ❤️ using .NET and Avalonia UI**
+
+</div>
