@@ -248,22 +248,6 @@ dotnet restore
 dotnet watch --project src/TaskMGR.UI
 ```
 
-### Code Style
-
-- Follow [C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
-- Use meaningful commit messages
-- Add XML documentation for public APIs
-
-## Roadmap
-
-- [ ] Linux support (TaskMGR.Platform.Linux)
-- [ ] Process details panel (threads, handles, modules)
-- [ ] CPU/Memory usage graphs over time
-- [ ] Network activity monitoring
-- [ ] Disk I/O statistics
-- [ ] System tray integration
-- [ ] Configurable refresh intervals via UI
-- [ ] Export process list to CSV
 
 ## License
 
@@ -271,8 +255,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ---
 
-<div align="center">
 
-**Built with ❤️ using .NET and Avalonia UI**
-
-</div>
