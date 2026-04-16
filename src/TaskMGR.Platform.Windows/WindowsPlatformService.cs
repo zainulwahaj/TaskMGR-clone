@@ -1,138 +1,183 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.ObjectPool;
+using TaskMGR.Core.Constants;
 using TaskMGR.Core.Interfaces;
 using TaskMGR.Core.Models;
+using TaskMGR.Core.Results;
 
 namespace TaskMGR.Platform.Windows;
 
-public class WindowsPlatformService : IPlatformService
+public sealed class WindowsPlatformService : IPlatformService
 {
-    public string PlatformName => "Windows";
+    private readonly IProcessCpuCache _cpuUsageCache;
+    private readonly ObjectPool<List<ProcessInfo>> _processListPool;
+    private int _lastProcessCount;
+    private int _lastThreadCount;
+    private double _lastCpuUsagePercent;
 
-    private readonly Dictionary<int, (DateTime lastTime, TimeSpan lastTotalTime)> _cpuUsageCache = new();
-
-    public Task<IReadOnlyList<ProcessInfo>> GetProcessesAsync(CancellationToken cancellationToken = default)
+    public WindowsPlatformService()
+        : this(new ProcessCpuCache())
     {
-        var processes = new List<ProcessInfo>();
-        var currentTime = DateTime.UtcNow;
+    }
 
-        foreach (var proc in Process.GetProcesses())
+    public WindowsPlatformService(IProcessCpuCache cpuUsageCache)
+        : this(
+            cpuUsageCache,
+            new DefaultObjectPoolProvider().Create(new ProcessInfoListPooledObjectPolicy()))
+    {
+    }
+
+    internal WindowsPlatformService(
+        IProcessCpuCache cpuUsageCache,
+        ObjectPool<List<ProcessInfo>> processListPool)
+    {
+        _cpuUsageCache = cpuUsageCache;
+        _processListPool = processListPool;
+    }
+
+    public string PlatformName => PlatformNames.Windows;
+
+    public Task<Result<IReadOnlyList<ProcessInfo>, string>> GetProcessesAsync(CancellationToken cancellationToken = default)
+    {
+        var processes = _processListPool.Get();
+
+        try
         {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            var totalThreads = 0;
+            var totalCpu = 0d;
 
-                double cpuPercent = 0;
-                
-                // Calculate CPU usage
-                if (_cpuUsageCache.TryGetValue(proc.Id, out var cached))
+            foreach (var proc in Process.GetProcesses())
+            {
+                using (proc)
                 {
-                    var timeDiff = (currentTime - cached.lastTime).TotalMilliseconds;
-                    if (timeDiff > 0)
+                    try
                     {
-                        var cpuDiff = (proc.TotalProcessorTime - cached.lastTotalTime).TotalMilliseconds;
-                        cpuPercent = (cpuDiff / timeDiff) * 100 / Environment.ProcessorCount;
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        _cpuUsageCache.Update(proc.Id, proc.TotalProcessorTime);
+                        _cpuUsageCache.TryGetPercent(proc.Id, out var cpuPercent);
+
+                        processes.Add(
+                            ProcessInfo.Create(
+                                proc.Id,
+                                proc.ProcessName,
+                                Math.Round(cpuPercent, 1),
+                                proc.WorkingSet64,
+                                proc.Responding ? "Running" : "Not Responding",
+                                GetProcessUser(),
+                                GetProcessStartTime(proc)));
+
+                        totalThreads += GetThreadCount(proc);
+                        totalCpu += cpuPercent;
+                    }
+                    catch (Exception ex) when (ex is InvalidOperationException or Win32Exception or NotSupportedException)
+                    {
+                        // Process may have exited or deny access mid-snapshot.
                     }
                 }
-                
-                _cpuUsageCache[proc.Id] = (currentTime, proc.TotalProcessorTime);
+            }
 
-                processes.Add(new ProcessInfo
-                {
-                    Pid = proc.Id,
-                    Name = proc.ProcessName,
-                    CpuPercent = Math.Round(cpuPercent, 1),
-                    MemoryBytes = proc.WorkingSet64,
-                    Status = proc.Responding ? "Running" : "Not Responding",
-                    User = GetProcessUser(proc),
-                    StartTime = GetProcessStartTime(proc)
-                });
-            }
-            catch (Exception)
-            {
-                // Process may have exited
-            }
+            var activeIds = processes.Select(process => process.Pid).ToHashSet();
+            _cpuUsageCache.Cleanup(activeIds);
+
+            _lastProcessCount = processes.Count;
+            _lastThreadCount = totalThreads;
+            _lastCpuUsagePercent = Math.Min(100d, Math.Round(totalCpu, 1));
+
+            return Task.FromResult(Result<IReadOnlyList<ProcessInfo>, string>.Ok(processes.ToArray()));
         }
-
-        // Clean up stale cache entries
-        var activeIds = processes.Select(p => p.Pid).ToHashSet();
-        var staleIds = _cpuUsageCache.Keys.Where(id => !activeIds.Contains(id)).ToList();
-        foreach (var id in staleIds)
-            _cpuUsageCache.Remove(id);
-
-        return Task.FromResult<IReadOnlyList<ProcessInfo>>(processes);
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(Result<IReadOnlyList<ProcessInfo>, string>.Fail($"Unable to enumerate processes: {ex.Message}"));
+        }
+        finally
+        {
+            _processListPool.Return(processes);
+        }
     }
 
     public async Task<ProcessInfo?> GetProcessByIdAsync(int pid, CancellationToken cancellationToken = default)
     {
-        var processes = await GetProcessesAsync(cancellationToken);
-        return processes.FirstOrDefault(p => p.Pid == pid);
+        var result = await GetProcessesAsync(cancellationToken).ConfigureAwait(false);
+        if (!result.IsSuccess)
+        {
+            throw new InvalidOperationException(result.Error);
+        }
+
+        return result.Value.FirstOrDefault(p => p.Pid == pid);
     }
 
-    public Task<bool> KillProcessAsync(int pid, CancellationToken cancellationToken = default)
+    public Task<Result<Unit, ProcessError>> KillProcessAsync(int pid, CancellationToken cancellationToken = default)
     {
         try
         {
-            var process = Process.GetProcessById(pid);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using var process = Process.GetProcessById(pid);
             process.Kill();
-            return Task.FromResult(true);
+            return Task.FromResult(Result<Unit, ProcessError>.Ok(Unit.Value));
+        }
+        catch (ArgumentException)
+        {
+            return Task.FromResult(Result<Unit, ProcessError>.Fail(ProcessError.NotFound));
+        }
+        catch (InvalidOperationException)
+        {
+            return Task.FromResult(Result<Unit, ProcessError>.Fail(ProcessError.NotFound));
+        }
+        catch (Win32Exception)
+        {
+            return Task.FromResult(Result<Unit, ProcessError>.Fail(ProcessError.AccessDenied));
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Task.FromResult(Result<Unit, ProcessError>.Fail(ProcessError.AccessDenied));
         }
         catch
         {
-            return Task.FromResult(false);
+            return Task.FromResult(Result<Unit, ProcessError>.Fail(ProcessError.Unknown));
         }
     }
 
-    public async Task<SystemMetrics> GetSystemMetricsAsync(CancellationToken cancellationToken = default)
+    public Task<SystemMetrics> GetSystemMetricsAsync(CancellationToken cancellationToken = default)
     {
-        var processes = await GetProcessesAsync(cancellationToken);
-        
-        // Get memory info using GC and Environment
-        var gcMemoryInfo = GC.GetGCMemoryInfo();
-        
+        cancellationToken.ThrowIfCancellationRequested();
+
         long totalMemory = 0;
         long availableMemory = 0;
 
         if (OperatingSystem.IsWindows())
         {
-            try
+            var memStatus = new MEMORYSTATUSEX { dwLength = 64 };
+            if (!GlobalMemoryStatusEx(ref memStatus))
             {
-                var memStatus = new MEMORYSTATUSEX { dwLength = 64 };
-                if (GlobalMemoryStatusEx(ref memStatus))
-                {
-                    totalMemory = (long)memStatus.ullTotalPhys;
-                    availableMemory = (long)memStatus.ullAvailPhys;
-                }
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Unable to read system memory information.");
             }
-            catch { }
+
+            totalMemory = (long)memStatus.ullTotalPhys;
+            availableMemory = (long)memStatus.ullAvailPhys;
         }
 
-        // Calculate total CPU from all processes
-        double totalCpu = processes.Sum(p => p.CpuPercent);
-
-        return new SystemMetrics
-        {
-            CpuUsagePercent = Math.Min(100, Math.Round(totalCpu, 1)),
-            TotalMemoryBytes = totalMemory,
-            UsedMemoryBytes = totalMemory - availableMemory,
-            AvailableMemoryBytes = availableMemory,
-            ProcessCount = processes.Count,
-            ThreadCount = processes.Count * 10, // Approximation
-            Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64)
-        };
+        return Task.FromResult(
+            new SystemMetrics
+            {
+                CpuUsagePercent = _lastCpuUsagePercent,
+                TotalMemoryBytes = totalMemory,
+                UsedMemoryBytes = totalMemory - availableMemory,
+                AvailableMemoryBytes = availableMemory,
+                ProcessCount = _lastProcessCount,
+                ThreadCount = _lastThreadCount,
+                Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64)
+            });
     }
 
-    private static string GetProcessUser(Process process)
-    {
-        try
-        {
-            return Environment.UserName;
-        }
-        catch
-        {
-            return "SYSTEM";
-        }
-    }
+    private static string GetProcessUser() => Environment.UserName;
 
     private static DateTime GetProcessStartTime(Process process)
     {
@@ -140,9 +185,21 @@ public class WindowsPlatformService : IPlatformService
         {
             return process.StartTime;
         }
-        catch
+        catch (Exception ex) when (ex is InvalidOperationException or Win32Exception or NotSupportedException)
         {
             return DateTime.MinValue;
+        }
+    }
+
+    private static int GetThreadCount(Process process)
+    {
+        try
+        {
+            return process.Threads.Count;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or Win32Exception or NotSupportedException)
+        {
+            return 0;
         }
     }
 

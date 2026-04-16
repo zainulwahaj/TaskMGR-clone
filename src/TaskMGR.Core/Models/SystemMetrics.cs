@@ -1,6 +1,6 @@
 namespace TaskMGR.Core.Models;
 
-public record SystemMetrics
+public sealed record SystemMetrics
 {
     public double CpuUsagePercent { get; init; }
     public long TotalMemoryBytes { get; init; }

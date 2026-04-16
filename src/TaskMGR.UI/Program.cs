@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using Fonts.Avalonia.JetBrainsMono;
 
 namespace TaskMGR.UI;
 
@@ -16,6 +17,6 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .WithInterFont()
+            .WithJetBrainsMonoFont()
             .LogToTrace();
 }

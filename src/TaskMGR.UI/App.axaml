@@ -5,11 +5,198 @@
              RequestedThemeVariant="Dark">
 
     <Application.Resources>
+        <FontFamily x:Key="TerminalFontFamily">Jetbrains Mono, Consolas, Courier New, Monospace</FontFamily>
+
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#0a0c0a"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#0e120e"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#1e2e1e"/>
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#b4d4b4"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#39ff14"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#e8a000"/>
+        <SolidColorBrush x:Key="DangerBrush" Color="#ff3c3c"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#3a4a3a"/>
+        <SolidColorBrush x:Key="ScanlineBrushColor" Color="#19b4d4b4"/>
+        <SolidColorBrush x:Key="SelectionBrush" Color="#003300"/>
+        <SolidColorBrush x:Key="RowAltBrush" Color="#111611"/>
+        <SolidColorBrush x:Key="BlackBrush" Color="#000000"/>
+
+        <DrawingBrush x:Key="ScanlineBrush"
+                      TileMode="Tile"
+                      Stretch="None"
+                      AlignmentX="Left"
+                      AlignmentY="Top"
+                      DestinationRect="0,0,4,4"
+                      SourceRect="0,0,4,4">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="{StaticResource ScanlineBrushColor}" Geometry="M0,0 L4,0 4,2 0,2 Z"/>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
         <conv:BytesToStringConverter x:Key="BytesToStringConverter"/>
+        <conv:CpuPercentToColorConverter x:Key="CpuPercentToColorConverter"/>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontFamily" Value="{StaticResource TerminalFontFamily}"/>
+        </Style>
+
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontFamily" Value="{StaticResource TerminalFontFamily}"/>
+        </Style>
+
+        <Style Selector="Border.panel-shell">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style Selector="TextBlock.section-label">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style Selector="TextBlock.toolbar-status">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style Selector="TextBox.terminal-filter">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="FontFamily" Value="{StaticResource TerminalFontFamily}"/>
+            <Setter Property="Padding" Value="12,8"/>
+        </Style>
+
+        <Style Selector="Button.terminal-button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="{StaticResource TerminalFontFamily}"/>
+            <Setter Property="Padding" Value="14,8"/>
+        </Style>
+
+        <Style Selector="Button.terminal-button:pointerover">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+        </Style>
+
+        <Style Selector="Button.terminal-button:pressed">
+            <Setter Property="Background" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+        </Style>
+
+        <Style Selector="Ellipse.loading-led">
+            <Setter Property="Opacity" Value="0.22"/>
+        </Style>
+
+        <Style Selector="Ellipse.loading-led.loading">
+            <Style.Animations>
+                <Animation Duration="0:0:0.8" IterationCount="Infinite" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.18"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="Border.blink-block">
+            <Style.Animations>
+                <Animation Duration="0:0:1" IterationCount="Infinite">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="49%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="TextBlock.status-pulse">
+            <Setter Property="Opacity" Value="0.15"/>
+        </Style>
+
+        <Style Selector="TextBlock.status-pulse.active">
+            <Style.Animations>
+                <Animation Duration="0:0:0.9" IterationCount="Infinite">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.15"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.15"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowBackground" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+            <Setter Property="RowHeight" Value="28"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="FontFamily" Value="{StaticResource TerminalFontFamily}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid DataGridCell">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid DataGridRow:nth-child(even)">
+            <Setter Property="Background" Value="{StaticResource RowAltBrush}"/>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid DataGridRow:selected">
+            <Setter Property="Background" Value="{StaticResource SelectionBrush}"/>
+        </Style>
+
+        <Style Selector="DataGrid.terminal-grid DataGridCell:selected">
+            <Setter Property="Background" Value="{StaticResource SelectionBrush}"/>
+        </Style>
     </Application.Styles>
 </Application>

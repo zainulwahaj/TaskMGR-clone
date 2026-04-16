@@ -4,23 +4,48 @@ using Avalonia.Data.Converters;
 
 namespace TaskMGR.UI.Converters;
 
-public class BytesToStringConverter : IValueConverter
+public sealed class BytesToStringConverter : IValueConverter
 {
+    public static string FormatBytes(long bytes)
+    {
+        const double kilobyte = 1024d;
+        const double gigabyte = 1024d * 1024 * 1024;
+        const double megabyte = 1024d * 1024;
+
+        var safeBytes = Math.Max(0, bytes);
+
+        if (safeBytes < kilobyte)
+        {
+            return $"{safeBytes} B";
+        }
+
+        if (safeBytes < megabyte)
+        {
+            return FormatSize(safeBytes / kilobyte, "KB");
+        }
+
+        if (safeBytes >= gigabyte)
+        {
+            return FormatSize(safeBytes / gigabyte, "GB");
+        }
+
+        return FormatSize(safeBytes / megabyte, "MB");
+    }
+
+    private static string FormatSize(double value, string unit)
+    {
+        var format = Math.Abs(value % 1d) < double.Epsilon ? "0" : "0.0";
+        return $"{value.ToString(format, CultureInfo.InvariantCulture)} {unit}";
+    }
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not long bytes) return "0 B";
-        
-        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
-        double len = bytes;
-        int order = 0;
-        
-        while (len >= 1024 && order < sizes.Length - 1)
+        if (value is not long bytes)
         {
-            order++;
-            len /= 1024;
+            return FormatBytes(0);
         }
-        
-        return $"{len:0.##} {sizes[order]}";
+
+        return FormatBytes(bytes);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -41,6 +41,16 @@ Output location: `src/TaskMGR.UI/bin/Release/net8.0/{runtime}/publish/`
 
 To create a proper `.app` bundle for macOS:
 
+### 2.0 Generate Icon From SVG
+TaskMGR now keeps the source icon as SVG at `src/TaskMGR.UI/Assets/AppIcon.svg`.
+Generate an `.icns` file from it before bundling:
+
+```bash
+./scripts/generate-macos-icon.sh
+```
+
+Output: `src/TaskMGR.UI/Assets/AppIcon.icns`
+
 ### 2.1 Create Bundle Structure
 ```bash
 APP_NAME="TaskMGR"
@@ -52,6 +62,9 @@ mkdir -p "${BUNDLE_DIR}/Contents/Resources"
 
 # Copy published files
 cp -R ${PUBLISH_DIR}/* "${BUNDLE_DIR}/Contents/MacOS/"
+
+# Copy app icon
+cp src/TaskMGR.UI/Assets/AppIcon.icns "${BUNDLE_DIR}/Contents/Resources/AppIcon.icns"
 ```
 
 ### 2.2 Create Info.plist
@@ -75,6 +88,8 @@ cat > "${BUNDLE_DIR}/Contents/Info.plist" << 'EOF'
     <string>TaskMGR.UI</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon.icns</string>
     <key>LSMinimumSystemVersion</key>
     <string>11.0</string>
     <key>NSHighResolutionCapable</key>

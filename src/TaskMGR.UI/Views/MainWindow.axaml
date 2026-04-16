@@ -1,0 +1,208 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:TaskMGR.UI.ViewModels"
+        xmlns:controls="using:TaskMGR.UI.Controls"
+        xmlns:core="using:TaskMGR.Core.Models"
+        mc:Ignorable="d"
+        x:Class="TaskMGR.UI.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Width="1120"
+        Height="760"
+        MinWidth="900"
+        MinHeight="560"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto">
+        <Border Grid.Row="0" Classes="panel-shell" Padding="16" Margin="0,0,0,10">
+            <Grid>
+                <Rectangle Fill="{StaticResource ScanlineBrush}" Opacity="0.10" IsHitTestVisible="False"/>
+
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="14">
+                    <controls:ArcMeterControl Grid.Column="0"
+                                              Label="CPU"
+                                              Value="{Binding CpuMeterValue}"
+                                              DisplayText="{Binding CpuMeterText}"
+                                              AccentBrush="{StaticResource AccentBrush}"
+                                              Height="148"/>
+
+                    <controls:ArcMeterControl Grid.Column="1"
+                                              Label="MEM"
+                                              Value="{Binding MemoryMeterValue}"
+                                              DisplayText="{Binding MemoryMeterText}"
+                                              AccentBrush="{StaticResource AccentBrush}"
+                                              Height="148"/>
+
+                    <controls:ArcMeterControl Grid.Column="2"
+                                              Label="PROCS"
+                                              Value="{Binding ProcessMeterValue}"
+                                              DisplayText="{Binding ProcessMeterText}"
+                                              AccentBrush="{StaticResource PrimaryTextBrush}"
+                                              Height="148"/>
+
+                    <controls:ArcMeterControl Grid.Column="3"
+                                              Label="UPTIME"
+                                              DisplayText="{Binding UptimeTickerText}"
+                                              AccentBrush="{StaticResource WarningBrush}"
+                                              ShowArc="False"
+                                              Height="148"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Classes="panel-shell" Padding="12" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                <Grid Grid.Column="0" Width="280">
+                    <TextBox Classes="terminal-filter"
+                             Text="{Binding SearchText}"
+                             VerticalContentAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal"
+                                IsHitTestVisible="False"
+                                IsVisible="{Binding IsSearchHintVisible}"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0"
+                                Spacing="4">
+                        <TextBlock Text="&gt; FILTER_" Foreground="{StaticResource MutedBrush}"/>
+                        <Border Classes="blink-block"
+                                Background="{StaticResource AccentBrush}"
+                                Width="10"
+                                Height="16"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Grid.Column="1"
+                           Classes="toolbar-status"
+                           Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    <Ellipse Classes="loading-led"
+                             Classes.loading="{Binding IsLoading}"
+                             Width="8"
+                             Height="8"
+                             Fill="{StaticResource AccentBrush}"/>
+
+                    <Button Classes="terminal-button"
+                            Content="REFRESH"
+                            Command="{Binding RefreshCommand}"
+                            IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <Button Grid.Column="3"
+                        Classes="terminal-button"
+                        Content="END TASK"
+                        Command="{Binding KillProcessCommand}"
+                        IsEnabled="{Binding SelectedProcess, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            </Grid>
+        </Border>
+
+        <DataGrid Grid.Row="2"
+                  Classes="terminal-grid"
+                  ItemsSource="{Binding Processes}"
+                  SelectedItem="{Binding SelectedProcess}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  CanUserResizeColumns="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="PID" Width="72">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding Pid}"
+                                       TextAlignment="Right"
+                                       HorizontalAlignment="Stretch"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="NAME" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="CPU %" Width="92">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding CpuPercent, StringFormat={}{0:0.0}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="Right">
+                                <TextBlock.Foreground>
+                                    <MultiBinding Converter="{StaticResource CpuPercentToColorConverter}">
+                                        <Binding Path="CpuPercent"/>
+                                        <Binding Source="{StaticResource PrimaryTextBrush}"/>
+                                        <Binding Source="{StaticResource WarningBrush}"/>
+                                        <Binding Source="{StaticResource DangerBrush}"/>
+                                    </MultiBinding>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="MEMORY" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding MemoryBytes, Converter={StaticResource BytesToStringConverter}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="Right"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="STATUS" Width="112">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding Status}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="USER" Width="140">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <TextBlock Text="{Binding User}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="TREND" Width="136">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="core:ProcessInfo">
+                            <controls:MiniSparklineControl Samples="{Binding CpuHistorySamples}"
+                                                           StrokeBrush="{StaticResource AccentBrush}"
+                                                           Height="20"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="3" Classes="panel-shell" Padding="8,6" Margin="0,10,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding StatusLineText}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1"
+                           Classes="status-pulse"
+                           Classes.active="{Binding IsAutoRefreshActive}"
+                           Text="●"
+                           Foreground="{StaticResource AccentBrush}"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
